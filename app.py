@@ -54,7 +54,15 @@ def predict_image(model, image_tensor):
     return hcq_toxicity_probability
 
 # Load model on startup
-model = load_model('hcquery_model.pt')
+print("Loading model...")
+try:
+    model = load_model('hcquery_model.pt')
+    print("Model loaded successfully!")
+except Exception as e:
+    print(f"Failed to load model: {e}")
+    import traceback
+    traceback.print_exc()
+    model = None
 
 @app.route('/')
 def index():
@@ -71,13 +79,19 @@ def predict():
     
     if file:
         try:
+            print(f"Processing file: {file.filename}")
+            
             # Preprocess the image
             image_tensor = preprocess_image(file)
             if image_tensor is None:
+                print("Image preprocessing failed")
                 return jsonify({'error': 'Failed to process image'}), 400
+            
+            print("Image preprocessed successfully, making prediction...")
             
             # Make prediction
             probability = predict_image(model, image_tensor)
+            print(f"Prediction made: {probability}")
             
             # Convert probability to percentage and create risk assessment
             percentage = probability * 100
@@ -99,6 +113,9 @@ def predict():
             })
             
         except Exception as e:
+            print(f"Error in prediction: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
     
     return jsonify({'error': 'Invalid file'}), 400

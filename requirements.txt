@@ -1,5 +1,5 @@
 Flask==3.0.0
-torch==2.5.1
+torch==2.7.1
 torchvision==0.22.1
 efficientnet-pytorch==0.7.1
 Pillow==10.4.0
